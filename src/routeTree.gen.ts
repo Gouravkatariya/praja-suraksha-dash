@@ -13,7 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AgenciesRouteImport } from './routes/agencies'
 import { Route as DuplicatesRouteImport } from './routes/duplicates'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as BriefIndexRouteImport } from './routes/brief.index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
+import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,9 +37,19 @@ const MapRoute = MapRouteImport.update({
   path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BriefIndexRoute = BriefIndexRouteImport.update({
+  id: '/brief/',
+  path: '/brief/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   id: '/projects/',
   path: '/projects/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsIdRoute = ProjectsIdRouteImport.update({
+  id: '/projects/$id',
+  path: '/projects/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -46,6 +58,8 @@ export interface FileRoutesByFullPath {
   '/agencies': typeof AgenciesRoute
   '/duplicates': typeof DuplicatesRoute
   '/map': typeof MapRoute
+  '/projects/$id': typeof ProjectsIdRoute
+  '/brief/': typeof BriefIndexRoute
   '/projects/': typeof ProjectsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +67,8 @@ export interface FileRoutesByTo {
   '/agencies': typeof AgenciesRoute
   '/duplicates': typeof DuplicatesRoute
   '/map': typeof MapRoute
+  '/projects/$id': typeof ProjectsIdRoute
+  '/brief': typeof BriefIndexRoute
   '/projects': typeof ProjectsIndexRoute
 }
 export interface FileRoutesById {
@@ -61,14 +77,38 @@ export interface FileRoutesById {
   '/agencies': typeof AgenciesRoute
   '/duplicates': typeof DuplicatesRoute
   '/map': typeof MapRoute
+  '/projects/$id': typeof ProjectsIdRoute
+  '/brief/': typeof BriefIndexRoute
   '/projects/': typeof ProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/agencies' | '/duplicates' | '/map' | '/projects/'
+  fullPaths:
+    | '/'
+    | '/agencies'
+    | '/duplicates'
+    | '/map'
+    | '/projects/$id'
+    | '/brief/'
+    | '/projects/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/agencies' | '/duplicates' | '/map' | '/projects'
-  id: '__root__' | '/' | '/agencies' | '/duplicates' | '/map' | '/projects/'
+  to:
+    | '/'
+    | '/agencies'
+    | '/duplicates'
+    | '/map'
+    | '/projects/$id'
+    | '/brief'
+    | '/projects'
+  id:
+    | '__root__'
+    | '/'
+    | '/agencies'
+    | '/duplicates'
+    | '/map'
+    | '/projects/$id'
+    | '/brief/'
+    | '/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +116,8 @@ export interface RootRouteChildren {
   AgenciesRoute: typeof AgenciesRoute
   DuplicatesRoute: typeof DuplicatesRoute
   MapRoute: typeof MapRoute
+  ProjectsIdRoute: typeof ProjectsIdRoute
+  BriefIndexRoute: typeof BriefIndexRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
 }
 
@@ -109,11 +151,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brief/': {
+      id: '/brief/'
+      path: '/brief'
+      fullPath: '/brief/'
+      preLoaderRoute: typeof BriefIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/': {
       id: '/projects/'
       path: '/projects'
       fullPath: '/projects/'
       preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/$id': {
+      id: '/projects/$id'
+      path: '/projects/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof ProjectsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -124,6 +180,8 @@ const rootRouteChildren: RootRouteChildren = {
   AgenciesRoute: AgenciesRoute,
   DuplicatesRoute: DuplicatesRoute,
   MapRoute: MapRoute,
+  ProjectsIdRoute: ProjectsIdRoute,
+  BriefIndexRoute: BriefIndexRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
 }
 export const routeTree = rootRouteImport
