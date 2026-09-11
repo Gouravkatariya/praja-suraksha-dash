@@ -44,6 +44,48 @@ function project(lat: number, lng: number) {
   return { x, y };
 }
 
+// Coarse India landmass outline [lat, lng] for orientation only (not survey-accurate).
+const INDIA_OUTLINE: Array<[number, number]> = [
+  [35.4, 77.0],
+  [34.1, 78.9],
+  [32.6, 79.1],
+  [30.4, 81.0],
+  [28.6, 84.0],
+  [27.5, 88.2],
+  [27.9, 89.3],
+  [26.9, 92.1],
+  [27.9, 95.4],
+  [27.0, 97.4],
+  [25.2, 94.6],
+  [23.4, 93.4],
+  [22.0, 92.6],
+  [23.7, 91.0],
+  [25.2, 89.8],
+  [22.6, 88.9],
+  [21.5, 87.0],
+  [19.9, 85.5],
+  [17.7, 83.3],
+  [15.9, 80.9],
+  [13.1, 80.3],
+  [10.3, 79.9],
+  [8.1, 77.5],
+  [9.9, 76.2],
+  [12.8, 74.8],
+  [15.9, 73.6],
+  [19.0, 72.8],
+  [21.7, 72.6],
+  [22.3, 69.0],
+  [23.7, 68.2],
+  [25.2, 70.9],
+  [27.9, 70.6],
+  [30.0, 74.5],
+  [32.3, 75.3],
+  [34.5, 74.1],
+  [35.4, 77.0],
+];
+
+
+
 function dominantTier(d: { critical: number; high: number; medium: number }): RiskTier {
   if (d.critical >= 8) return "Critical";
   if (d.critical > 0 || d.high >= 25) return "High";
