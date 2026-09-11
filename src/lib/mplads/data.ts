@@ -207,16 +207,21 @@ function buildSignals(
     ],
   };
 
-  return SIGNAL_META.map((m) => ({
-    key: m.key,
-    label: m.label,
-    weight: m.weight,
-    score: scores[m.key] ?? 20,
-    verdict: verdict(scores[m.key] ?? 20),
-    headline: evidence[m.key][0],
-    evidence: evidence[m.key],
-  }));
+  return SIGNAL_META.map((m) => {
+    const list = evidence[m.key] as string[];
+    const score = scores[m.key] ?? 20;
+    return {
+      key: m.key,
+      label: m.label,
+      weight: m.weight,
+      score,
+      verdict: verdict(score),
+      headline: list[0] as string,
+      evidence: list,
+    };
+  });
 }
+
 
 function scoreForTier(tier: RiskTier, rand: () => number): number {
   if (tier === "Critical") return 80 + Math.round(rand() * 19);
