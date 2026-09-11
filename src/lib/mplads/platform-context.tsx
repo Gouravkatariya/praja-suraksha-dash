@@ -30,7 +30,7 @@ const STORAGE_KEY = "mplads.platform.settings";
 const Ctx = createContext<PlatformState | null>(null);
 
 export function PlatformProvider({ children }: { children: ReactNode }) {
-  const [persona, setPersona] = useState<Persona>(PERSONAS[0]);
+  const [persona, setPersona] = useState<Persona>("MoSPI Central Monitoring Officer");
   const [mode, setMode] = useState<BackendMode>("mock");
   const [endpoint, setEndpoint] = useState(DEFAULT_ENDPOINT);
   const [health, setHealth] = useState<HealthState>("unknown");
