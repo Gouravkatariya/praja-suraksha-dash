@@ -58,8 +58,16 @@ function RiskProfile() {
   const work = getWork(id)!;
   const peers = getPeers(work);
 
+  const shortLabel: Record<string, string> = {
+    cost: "Cost",
+    timeline: "Timeline",
+    mismatch: "Fund/Work gap",
+    duplicate: "Duplicate",
+    agency: "Agency",
+    compliance: "Compliance",
+  };
   const radar = work.signals.map((s) => ({
-    signal: s.label.split(" ").slice(0, 2).join(" "),
+    signal: shortLabel[s.key] ?? s.key,
     score: s.score,
   }));
 
