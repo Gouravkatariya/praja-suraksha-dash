@@ -156,23 +156,31 @@ function Brief() {
             <h2 className="mb-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
               3. Red flags observed
             </h2>
-            <ol className="space-y-3">
-              {redFlags.map((s, i) => (
-                <li key={s.key} className="rounded-md border p-3">
-                  <p className="text-sm font-semibold">
-                    {i + 1}. {s.label}{" "}
-                    <span className="font-mono text-xs text-muted-foreground">
-                      (intensity {s.score}/100)
-                    </span>
-                  </p>
-                  <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-                    {s.evidence.map((e) => (
-                      <li key={e}>• {e}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ol>
+            {redFlags.length === 0 ? (
+              <p className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
+                No anomaly signal crossed the flagging threshold for this work. Routine verification
+                only; no adverse inference is drawn.
+              </p>
+            ) : (
+              <ol className="space-y-3">
+                {redFlags.map((s, i) => (
+                  <li key={s.key} className="rounded-md border p-3">
+                    <p className="text-sm font-semibold">
+                      {i + 1}. {s.label}{" "}
+                      <span className="font-mono text-xs text-muted-foreground">
+                        (intensity {s.score}/100)
+                      </span>
+                    </p>
+                    <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+                      {s.evidence.map((e) => (
+                        <li key={e}>• {e}</li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            )}
+
           </section>
 
           <section>
