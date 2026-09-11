@@ -207,16 +207,21 @@ function buildSignals(
     ],
   };
 
-  return SIGNAL_META.map((m) => ({
-    key: m.key,
-    label: m.label,
-    weight: m.weight,
-    score: scores[m.key] ?? 20,
-    verdict: verdict(scores[m.key] ?? 20),
-    headline: evidence[m.key][0],
-    evidence: evidence[m.key],
-  }));
+  return SIGNAL_META.map((m) => {
+    const list = evidence[m.key] as string[];
+    const score = scores[m.key] ?? 20;
+    return {
+      key: m.key,
+      label: m.label,
+      weight: m.weight,
+      score,
+      verdict: verdict(score),
+      headline: list[0] as string,
+      evidence: list,
+    };
+  });
 }
+
 
 function scoreForTier(tier: RiskTier, rand: () => number): number {
   if (tier === "Critical") return 80 + Math.round(rand() * 19);
@@ -234,14 +239,18 @@ function buildWorks(): Work[] {
   // deterministic shuffle
   for (let i = tierPlan.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
-    [tierPlan[i], tierPlan[j]] = [tierPlan[j], tierPlan[i]];
+    const a = tierPlan[i] as RiskTier;
+    const b = tierPlan[j] as RiskTier;
+    tierPlan[i] = b;
+    tierPlan[j] = a;
   }
 
   return tierPlan.map((tier, i) => {
-    const st = STATES[Math.floor(rand() * STATES.length)];
-    const district = st.districts[Math.floor(rand() * st.districts.length)];
-    const workType = WORK_TYPES[Math.floor(rand() * WORK_TYPES.length)];
-    const agency = AGENCIES[Math.floor(rand() * AGENCIES.length)];
+    const st = STATES[Math.floor(rand() * STATES.length)] as (typeof STATES)[number];
+    const district = st.districts[Math.floor(rand() * st.districts.length)] as string;
+    const workType = WORK_TYPES[Math.floor(rand() * WORK_TYPES.length)] as string;
+    const agency = AGENCIES[Math.floor(rand() * AGENCIES.length)] as string;
+
     const sanctionedLakh = Math.round((8 + rand() * 92) * 10) / 10;
 
     const riskScore = scoreForTier(tier, rand);
@@ -414,8 +423,10 @@ export function getDuplicatePairs(): DuplicatePair[] {
   const pairs: DuplicatePair[] = [];
   for (let i = 0; i < 24; i++) {
     const a = flagged[i * 3];
+    if (!a) continue;
     const b = flagged.find((w, idx) => idx > i * 3 && w.district === a.district && w.workType === a.workType);
-    if (!a || !b) continue;
+    if (!b) continue;
+
     const sim = Math.round(78 + rand() * 21);
     pairs.push({
       id: `DUP-${100 + i}`,

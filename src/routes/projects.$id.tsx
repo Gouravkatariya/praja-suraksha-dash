@@ -58,8 +58,16 @@ function RiskProfile() {
   const work = getWork(id)!;
   const peers = getPeers(work);
 
+  const shortLabel: Record<string, string> = {
+    cost: "Cost",
+    timeline: "Timeline",
+    mismatch: "Fund/Work gap",
+    duplicate: "Duplicate",
+    agency: "Agency",
+    compliance: "Compliance",
+  };
   const radar = work.signals.map((s) => ({
-    signal: s.label.split(" ").slice(0, 2).join(" "),
+    signal: shortLabel[s.key] ?? s.key,
     score: s.score,
   }));
 
@@ -184,7 +192,7 @@ function RiskProfile() {
                         <MetricBar
                           label={`Signal intensity · weight ${(s.weight * 100).toFixed(0)}%`}
                           value={s.score}
-                          color={verdictColor[s.verdict]}
+                          color={verdictColor[s.verdict] ?? "var(--navy)"}
                         />
                       </div>
                       <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground">

@@ -102,7 +102,19 @@ function RiskMap() {
                     </pattern>
                   </defs>
                   <rect width="100" height="100" fill="url(#grid)" />
+                  <polygon
+                    points={INDIA_OUTLINE.map(([lat, lng]) => {
+                      const p = project(lat, lng);
+                      return `${p.x},${p.y}`;
+                    }).join(" ")}
+                    fill="oklch(0.98 0.01 240)"
+                    stroke="var(--navy)"
+                    strokeWidth="0.4"
+                    strokeLinejoin="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
                 </svg>
+
                 {districts.map((d) => {
                   const { x, y } = project(d.lat, d.lng);
                   const tier = dominantTier(d);
