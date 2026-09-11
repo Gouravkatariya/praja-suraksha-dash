@@ -30,8 +30,9 @@ export const Route = createFileRoute("/brief/$id")({
         ]
       : [{ title: "Brief unavailable" }, { name: "robots", content: "noindex" }],
   }),
-  component: Brief;
+  component: Brief,
 });
+
 
 const CHECKLIST = [
   "Physically verify the work site and record GPS-tagged photographs from three angles.",
