@@ -14,6 +14,7 @@ import { Route as AgenciesRouteImport } from './routes/agencies'
 import { Route as DuplicatesRouteImport } from './routes/duplicates'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as BriefIndexRouteImport } from './routes/brief.index'
+import { Route as BriefIdRouteImport } from './routes/brief.$id'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
 
@@ -42,6 +43,11 @@ const BriefIndexRoute = BriefIndexRouteImport.update({
   path: '/brief/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BriefIdRoute = BriefIdRouteImport.update({
+  id: '/brief/$id',
+  path: '/brief/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   id: '/projects/',
   path: '/projects/',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/agencies': typeof AgenciesRoute
   '/duplicates': typeof DuplicatesRoute
   '/map': typeof MapRoute
+  '/brief/$id': typeof BriefIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/brief/': typeof BriefIndexRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/agencies': typeof AgenciesRoute
   '/duplicates': typeof DuplicatesRoute
   '/map': typeof MapRoute
+  '/brief/$id': typeof BriefIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/brief': typeof BriefIndexRoute
   '/projects': typeof ProjectsIndexRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/agencies': typeof AgenciesRoute
   '/duplicates': typeof DuplicatesRoute
   '/map': typeof MapRoute
+  '/brief/$id': typeof BriefIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/brief/': typeof BriefIndexRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/agencies'
     | '/duplicates'
     | '/map'
+    | '/brief/$id'
     | '/projects/$id'
     | '/brief/'
     | '/projects/'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/agencies'
     | '/duplicates'
     | '/map'
+    | '/brief/$id'
     | '/projects/$id'
     | '/brief'
     | '/projects'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/agencies'
     | '/duplicates'
     | '/map'
+    | '/brief/$id'
     | '/projects/$id'
     | '/brief/'
     | '/projects/'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AgenciesRoute: typeof AgenciesRoute
   DuplicatesRoute: typeof DuplicatesRoute
   MapRoute: typeof MapRoute
+  BriefIdRoute: typeof BriefIdRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
   BriefIndexRoute: typeof BriefIndexRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BriefIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brief/$id': {
+      id: '/brief/$id'
+      path: '/brief/$id'
+      fullPath: '/brief/$id'
+      preLoaderRoute: typeof BriefIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/': {
       id: '/projects/'
       path: '/projects'
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgenciesRoute: AgenciesRoute,
   DuplicatesRoute: DuplicatesRoute,
   MapRoute: MapRoute,
+  BriefIdRoute: BriefIdRoute,
   ProjectsIdRoute: ProjectsIdRoute,
   BriefIndexRoute: BriefIndexRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
