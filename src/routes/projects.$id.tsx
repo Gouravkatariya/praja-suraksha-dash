@@ -184,7 +184,7 @@ function RiskProfile() {
                         <MetricBar
                           label={`Signal intensity · weight ${(s.weight * 100).toFixed(0)}%`}
                           value={s.score}
-                          color={verdictColor[s.verdict]}
+                          color={verdictColor[s.verdict] ?? "var(--navy)"}
                         />
                       </div>
                       <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground">
