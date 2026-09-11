@@ -423,8 +423,10 @@ export function getDuplicatePairs(): DuplicatePair[] {
   const pairs: DuplicatePair[] = [];
   for (let i = 0; i < 24; i++) {
     const a = flagged[i * 3];
+    if (!a) continue;
     const b = flagged.find((w, idx) => idx > i * 3 && w.district === a.district && w.workType === a.workType);
-    if (!a || !b) continue;
+    if (!b) continue;
+
     const sim = Math.round(78 + rand() * 21);
     pairs.push({
       id: `DUP-${100 + i}`,
