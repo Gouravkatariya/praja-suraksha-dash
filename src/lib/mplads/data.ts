@@ -239,14 +239,18 @@ function buildWorks(): Work[] {
   // deterministic shuffle
   for (let i = tierPlan.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
-    [tierPlan[i], tierPlan[j]] = [tierPlan[j], tierPlan[i]];
+    const a = tierPlan[i] as RiskTier;
+    const b = tierPlan[j] as RiskTier;
+    tierPlan[i] = b;
+    tierPlan[j] = a;
   }
 
   return tierPlan.map((tier, i) => {
-    const st = STATES[Math.floor(rand() * STATES.length)];
-    const district = st.districts[Math.floor(rand() * st.districts.length)];
-    const workType = WORK_TYPES[Math.floor(rand() * WORK_TYPES.length)];
-    const agency = AGENCIES[Math.floor(rand() * AGENCIES.length)];
+    const st = STATES[Math.floor(rand() * STATES.length)] as (typeof STATES)[number];
+    const district = st.districts[Math.floor(rand() * st.districts.length)] as string;
+    const workType = WORK_TYPES[Math.floor(rand() * WORK_TYPES.length)] as string;
+    const agency = AGENCIES[Math.floor(rand() * AGENCIES.length)] as string;
+
     const sanctionedLakh = Math.round((8 + rand() * 92) * 10) / 10;
 
     const riskScore = scoreForTier(tier, rand);
