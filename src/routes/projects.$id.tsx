@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { FileText, ShieldAlert } from "lucide-react";
+import { FileText, Loader2, ShieldAlert } from "lucide-react";
 
 import { AppShell } from "@/components/mplads/AppShell";
 import { Disclaimer, MetricBar, RiskBadge, RiskGauge } from "@/components/mplads/risk-ui";
@@ -21,12 +21,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RISK_DISCLAIMER, getPeers, getWork, tierColor } from "@/lib/mplads/data";
+import { useWorkDetailLive, useRiskFlagsForWorkLive } from "@/lib/mplads/live-data";
+import { usePlatform } from "@/lib/mplads/platform-context";
 
 export const Route = createFileRoute("/projects/$id")({
   loader: ({ params }) => {
-    const work = getWork(params.id);
-    if (!work) throw notFound();
-    return { id: work.id, name: work.name };
+    const isMock = params.id.startsWith("MP-");
+    if (isMock) {
+      const work = getWork(params.id);
+      if (!work) throw notFound();
+      return { id: work.id, name: work.name };
+    }
+    return { id: params.id, name: `Work #${params.id}` };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
@@ -53,8 +59,115 @@ const verdictColor: Record<string, string> = {
   Normal: "var(--risk-low)",
 };
 
+function LiveRiskProfile({ workId }: { workId: number }) {
+  const detailQ = useWorkDetailLive(workId);
+  const flagsQ = useRiskFlagsForWorkLive(workId);
+
+  if (detailQ.isLoading) {
+    return (
+      <AppShell title="Project Risk Profile" subtitle={`Work #${workId}`}>
+        <div className="flex justify-center py-16"><Loader2 className="size-8 animate-spin text-muted-foreground" /></div>
+      </AppShell>
+    );
+  }
+  if (!detailQ.data) {
+    return (
+      <AppShell title="Project Risk Profile" subtitle={`Work #${workId}`}>
+        <p className="text-sm text-destructive">{detailQ.isError ? String(detailQ.error) : "Work not found."}</p>
+      </AppShell>
+    );
+  }
+
+  const w = detailQ.data;
+  const flags = flagsQ.data?.risk_flags ?? [];
+  const disclaimer = flagsQ.data?.disclaimer ?? RISK_DISCLAIMER;
+
+  return (
+    <AppShell
+      title="Project Risk Profile"
+      subtitle={`#${w.work_id} · ${w.work_description ?? ""}`}
+      actions={
+        <>
+          <Button asChild variant="secondary"><Link to="/projects">Back to register</Link></Button>
+          <Button asChild>
+            <Link to="/brief/$id" params={{ id: String(w.work_id) }}>
+              <FileText className="mr-1 size-4" /> One-click investigation brief
+            </Link>
+          </Button>
+        </>
+      }
+    >
+      <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="space-y-4">
+          <Card>
+            <CardHeader><CardTitle className="flex items-center gap-2"><ShieldAlert className="size-4" /> Why was this flagged?</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <MetricBar label="Data quality score" value={w.data_quality.score ?? 0} color="var(--saffron)" />
+              <p className="text-xs text-muted-foreground">Flags: {w.priority.flag_count} · Highest level: {w.priority.highest_risk_level ?? "None"}</p>
+              <Disclaimer text={disclaimer} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle>Work particulars</CardTitle></CardHeader>
+            <CardContent>
+              <dl className="space-y-2 text-sm">
+                {([
+                  ["Category", w.category],
+                  ["Constituency", w.constituency],
+                  ["State", w.state],
+                  ["IDA", w.ida],
+                  ["Allocation", w.allocation_amount != null ? `₹${(w.allocation_amount / 100000).toFixed(2)} lakh` : null],
+                  ["Actual expenditure", w.actual_expenditure != null ? `₹${(w.actual_expenditure / 100000).toFixed(2)} lakh` : null],
+                  ["Sanction date", w.sanction_date],
+                  ["Expected completion", w.expected_completion_date],
+                  ["Status", w.status],
+                  ["IDA approval", w.ida_approval],
+                ] as [string, string | null | undefined][]).map(([k, v]) =>
+                  v ? (
+                    <div key={k} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+                      <dt className="text-muted-foreground">{k}</dt>
+                      <dd className="text-right font-medium">{v}</dd>
+                    </div>
+                  ) : null,
+                )}
+              </dl>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="space-y-4">
+          <Card>
+            <CardHeader><CardTitle>Risk flags from database</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              {flags.length === 0 && <p className="text-sm text-muted-foreground">No risk flags stored for this work.</p>}
+              {flags.map((f) => (
+                <div key={f.id} className="rounded-md border p-3">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold">{f.risk_type}</span>
+                    <span className="rounded-sm bg-muted px-2 py-0.5 text-[11px] font-semibold uppercase">{f.risk_level}</span>
+                    <span className="text-[11px] text-muted-foreground">{f.signal_origin}</span>
+                  </div>
+                  {f.evidence.map((e, i) => (
+                    <p key={i} className="mt-2 text-xs text-muted-foreground">{e.explanation}</p>
+                  ))}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </AppShell>
+  );
+}
+
 function RiskProfile() {
   const { id } = Route.useParams();
+  const { mode } = usePlatform();
+  const numericId = Number(id);
+
+  if (mode === "live" && !id.startsWith("MP-") && !isNaN(numericId)) {
+    return <LiveRiskProfile workId={numericId} />;
+  }
+
   const work = getWork(id)!;
   const peers = getPeers(work);
 

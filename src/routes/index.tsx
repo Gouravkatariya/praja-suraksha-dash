@@ -30,6 +30,7 @@ import {
   tierColor,
   type RiskTier,
 } from "@/lib/mplads/data";
+import { useTotalWorksCount } from "@/lib/mplads/live-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -92,6 +93,8 @@ function Dashboard() {
   const states = getStateRollups().slice(0, 8);
   const alerts = mismatchAlerts(6);
   const topRisk = getFlaggedWorks().slice(0, 8);
+  const liveTotal = useTotalWorksCount();
+  const displayTotal = typeof liveTotal === "number" ? liveTotal : TOTAL_WORKS;
 
   const stateChart = states.map((s) => ({
     state: s.state.length > 12 ? `${s.state.slice(0, 11)}…` : s.state,
@@ -104,7 +107,7 @@ function Dashboard() {
   return (
     <AppShell
       title="Executive Risk Dashboard"
-      subtitle={`${persona} · ${mode === "mock" ? "Hackathon Mock Mode" : "Live Backend"} · ${TOTAL_WORKS.toLocaleString("en-IN")} works under monitoring`}
+      subtitle={`${persona} · ${mode === "mock" ? "Hackathon Mock Mode" : "Live Backend"} · ${displayTotal.toLocaleString("en-IN")} works under monitoring`}
       actions={
         <Button asChild variant="secondary">
           <Link to="/projects">
