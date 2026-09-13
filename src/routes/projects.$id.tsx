@@ -17,7 +17,7 @@ import { FileText, Loader2, ShieldAlert } from "lucide-react";
 
 import { AppShell } from "@/components/mplads/AppShell";
 import { Disclaimer, MetricBar, RiskBadge, RiskGauge } from "@/components/mplads/risk-ui";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RISK_DISCLAIMER, getPeers, getWork, tierColor } from "@/lib/mplads/data";
@@ -25,6 +25,16 @@ import { useWorkDetailLive, useRiskFlagsForWorkLive } from "@/lib/mplads/live-da
 import { usePlatform } from "@/lib/mplads/platform-context";
 
 export const Route = createFileRoute("/projects/$id")({
+  pendingMs: 0,
+  pendingComponent: function ProfilePending() {
+    return (
+      <AppShell title="Project Risk Profile" subtitle="Loading work…">
+        <div className="flex justify-center py-16">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
+      </AppShell>
+    );
+  },
   loader: ({ params }) => {
     const isMock = params.id.startsWith("MP-");
     if (isMock) {
@@ -59,20 +69,41 @@ const verdictColor: Record<string, string> = {
   Normal: "var(--risk-low)",
 };
 
+function ProfileActions({ briefId }: { briefId: string }) {
+  return (
+    <>
+      <Link to="/projects" activeOptions={{ exact: true }} className={buttonVariants({ variant: "secondary" })}>
+        Back to register
+      </Link>
+      <Link to="/brief/$id" params={{ id: briefId }} className={buttonVariants()}>
+        <FileText className="mr-1 size-4" /> One-click investigation brief
+      </Link>
+    </>
+  );
+}
+
 function LiveRiskProfile({ workId }: { workId: number }) {
   const detailQ = useWorkDetailLive(workId);
   const flagsQ = useRiskFlagsForWorkLive(workId);
 
   if (detailQ.isLoading) {
     return (
-      <AppShell title="Project Risk Profile" subtitle={`Work #${workId}`}>
+      <AppShell
+        title="Project Risk Profile"
+        subtitle={`Work #${workId}`}
+        actions={<ProfileActions briefId={String(workId)} />}
+      >
         <div className="flex justify-center py-16"><Loader2 className="size-8 animate-spin text-muted-foreground" /></div>
       </AppShell>
     );
   }
   if (!detailQ.data) {
     return (
-      <AppShell title="Project Risk Profile" subtitle={`Work #${workId}`}>
+      <AppShell
+        title="Project Risk Profile"
+        subtitle={`Work #${workId}`}
+        actions={<ProfileActions briefId={String(workId)} />}
+      >
         <p className="text-sm text-destructive">{detailQ.isError ? String(detailQ.error) : "Work not found."}</p>
       </AppShell>
     );
@@ -86,16 +117,7 @@ function LiveRiskProfile({ workId }: { workId: number }) {
     <AppShell
       title="Project Risk Profile"
       subtitle={`#${w.work_id} · ${w.work_description ?? ""}`}
-      actions={
-        <>
-          <Button asChild variant="secondary"><Link to="/projects">Back to register</Link></Button>
-          <Button asChild>
-            <Link to="/brief/$id" params={{ id: String(w.work_id) }}>
-              <FileText className="mr-1 size-4" /> One-click investigation brief
-            </Link>
-          </Button>
-        </>
-      }
+      actions={<ProfileActions briefId={String(w.work_id)} />}
     >
       <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
         <div className="space-y-4">
@@ -202,18 +224,7 @@ function RiskProfile() {
     <AppShell
       title="Project Risk Profile"
       subtitle={`${work.id} · ${work.name}`}
-      actions={
-        <>
-          <Button asChild variant="secondary">
-            <Link to="/projects">Back to register</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/brief/$id" params={{ id: work.id }}>
-              <FileText className="mr-1 size-4" /> One-click investigation brief
-            </Link>
-          </Button>
-        </>
-      }
+      actions={<ProfileActions briefId={work.id} />}
     >
       <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
         <div className="space-y-4">

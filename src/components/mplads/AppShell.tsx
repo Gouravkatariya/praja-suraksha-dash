@@ -229,12 +229,14 @@ export function AppShell({
       </header>
 
       <main className="mx-auto max-w-[1600px] px-4 py-6">
-        <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:flex-wrap sm:justify-between">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
             <h1 className="truncate font-display text-3xl font-bold uppercase tracking-wide">{title}</h1>
             {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
           </div>
-          {actions && <div className="flex shrink-0 flex-wrap gap-2 no-print">{actions}</div>}
+          {actions && (
+            <div className="relative z-10 flex shrink-0 flex-wrap items-center gap-2 no-print">{actions}</div>
+          )}
         </div>
         {children}
       </main>
